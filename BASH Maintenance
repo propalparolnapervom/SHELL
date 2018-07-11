@@ -1,0 +1,816 @@
+
+
+
+        ### BASH (mostly) ###
+
+
+# ARIPHMETIC
+
+	-- http://bash.cyberciti.biz/guide/Perform_arithmetic_operations	
+  
+echo $(( 10 + 5 ))
+ 15
+
+
+x=2
+y=2
+echo "$((x/y)) kb"
+ 1 kb  
+
+
+
+
+# ANSWER: read input from the keyboard
+
+echo "		PLEASE, in another session: go to $USROLGRP_LOC and make   accessdb -> Users -> SQLscript"
+echo "		Are you done? (y/n):"
+    read answer junk
+	case "${answer}" in
+		y* | Y* )
+		   echo "If you see   users.sql   file below - it was successfull:"
+		   ls -la $USROLGRP_LOC | grep users.sql
+		   ;;
+		* )
+		   echo "Probably you've tried to make it Yes"
+		   ;;
+	esac
+
+
+
+
+# AWK: all
+    http://www.theunixschool.com/2012/05/different-ways-to-print-next-few-lines.html
+
+
+awk ' {print $1,$3} '
+
+--To print the third field of the fifth line:
+awk 'FNR == 5 {print $3}'
+
+-- total number of rows in the file
+awk 'END {print NR}' text.txt
+
+-- print next line after line with pattern
+awk '/own/{getline;print}' result.txt
+
+-- print next 2 lines after line with pattern (line with pattern is not printing)
+awk '/own/{x=NR+2;next}(NR<=x){print}' result.txt
+
+-- print only line #2 after line with pattern (line with pattern is not printing)
+awk '/own/{x=NR+2;next}(NR==x){print}' result.txt
+
+
+
+
+# VARIABLES: builtin variables
+
+echo "Last program's return value: $?"
+echo "Script's PID: $$"
+echo "Number of arguments passed to script: $#"
+echo "All arguments passed to script: $@"
+echo "Script's arguments separated into different variables: $1 $2..."
+
+
+
+
+# SED: all
+
+    #Remove all in the string AFTER some symbol (":" in the example)
+
+sed -e "s/:.*//"    
+
+    #Remove all in the string BEFORE some symbol (":" in the example)
+
+sed -e "s/.*://"
+    
+    #Remove all leading spaces/tabs/etc at the string
+        
+        #Can be without removing of tabs!!!
+    
+sed -e "s/^[ \t]*//"    
+
+        #Definetely removes tabs (turns tabs to spaces, then spaces turns to none)
+        
+cat LOSHA_with_TABS_and_SPACES.txt
+
+     |               ct losha        |
+     |       ct      |
+     |  ct   |
+
+cat LOSHA_with_TABS_and_SPACES.txt | expand | sed -e "s/ *|/|/g" -e "s/| */|/g"
+
+     |ct losha|
+     |ct|
+     |ct|        
+
+    #Sho string number 4 (for example)
+    
+sed '4!d'
+
+    #Sho only 1 string above string with pattern (WITHOUT string with pattern)
+    
+sed -n -e '/col=4/{x;p;d;}' -e x test.txt     
+    
+    OR
+    
+sed -n '/col=4/{x;p;d;}; x' test.txt
+
+    #Sho 2 strings above string with pattern (AND string with pattern too - so it's 3 strings in overall)
+    
+sed -n '1,/col=4/p' test.txt | tail -3
+
+    #Delete all character before certain word (string only after last occurence of that certain word lefts!!!)
+    
+sed "s/^.*ingres92_data/ingres92_data/"    
+    
+    #Delete (actually in file) string that contains a pattern
+    
+cp test test.orig
+sed '/\include/d' test > test.tmp
+mv test.tmp test
+    
+    #Delete lines 5 through 10 and 12
+    
+cp test test.orig
+sed -e '5,10d;12d' test > test.tmp
+mv test.tmp test
+    
+    
+
+
+# DURATION #1: how long script is running?
+
+    #Begininng of the script
+
+export SECONDS=0
+start_sec=$SECONDS
+
+
+    #Ending of the script
+
+duration_sec=$(( SECONDS - start_sec ))
+
+
+    #The you can work in this way, for example:
+    
+echo Duration_sec: $duration_sec sec
+
+
+
+
+# DURATION #2: how long script is running?    
+
+time ./time.sh
+
+    real    0m3.042s
+    user    0m0.013s
+    sys     0m0.032s
+    
+    
+    
+    
+# LOOP: for
+
+    #for shells: sh, ksh, bash (seq should be installed)
+    
+#!/bin/sh
+export db_count=`cat db_file | wc -l`
+for i in `seq 1 $db_count`
+do
+	echo i=${i}
+done
+    
+
+    #for shells: sh, ksh, bash (no special utilities should be installed)
+    
+i=1
+db_count=4
+
+while [ $i -le $db_count ]
+do
+    echo $i
+    i=$((i+1))
+done
+
+
+
+
+# LOOP: until
+
+    #ksh
+    
+until [[ is_finished = 1 ]];do
+
+	if [ "`$QQ | grep "empty queue"`" =  "empty queue" ]
+	then
+		#Edit loop marker
+			is_finished=1;
+		#Breake loop
+			break;
+	else
+		is_finished=0;
+	fi;
+	
+	
+	#Wait this time before next qq cheking
+		sleep 30;
+	
+done
+
+
+
+
+# TAB: how to add in the shell
+
+echo -e 'sdf\t df'
+    sdf      df
+
+
+
+
+  -- COMPARISON (numbers)
+
+-- is equal to
+if [ "$a" -eq "$b" ]
+
+-- is not equal to
+if [ "$a" -ne "$b" ]
+
+-- is greater than
+if [ "$a" -gt "$b" ]
+
+-- is greater than or equal to
+if [ "$a" -ge "$b" ]
+
+-- is less than
+if [ "$a" -lt "$b" ]
+
+-- is less than or equal to
+if [ "$a" -le "$b" ]
+
+-- is less than (within double parentheses)
+(("$a" < "$b"))
+
+-- is less than or equal to (within double parentheses)
+(("$a" <= "$b"))
+
+-- is greater than (within double parentheses)
+(("$a" > "$b"))
+
+-- is greater than or equal to (within double parentheses)
+(("$a" >= "$b"))
+
+
+
+
+  -- COMPARISON (string)
+
+-- BOOLEAN
+
+    OR and AND for commands in shell
+|| and && 
+
+    OR and AND like parameter
+-o и -a
+
+-- is equal to
+if [ "$a" = "$b" ]
+   Caution	
+   Note the whitespace framing the =.
+   if [ "$a"="$b" ] is not equivalent to the above.
+
+-- is equal to
+if [ "$a" == "$b" ]
+   This is a synonym for =.
+   Note	
+   The == comparison operator behaves differently within a double-brackets test than within single    brackets.
+   [[ $a == z* ]]   # True if $a starts with an "z" (pattern matching).
+   [[ $a == "z*" ]] # True if $a is equal to z* (literal matching).
+   [ $a == z* ]     # File globbing and word splitting take place.
+   [ "$a" == "z*" ] # True if $a is equal to z* (literal matching).
+
+-- is not equal to
+if [ "$a" != "$b" ]
+   This operator uses pattern matching within a [[ ... ]] construct.
+
+-- is less than, in ASCII alphabetical order
+if [[ "$a" < "$b" ]]
+if [ "$a" \< "$b" ]
+   Note that the "<" needs to be escaped within a [ ] construct.
+
+-- is greater than, in ASCII alphabetical order
+if [[ "$a" > "$b" ]]
+if [ "$a" \> "$b" ]
+   Note that the ">" needs to be escaped within a [ ] construct.
+
+-- string is null, that is, has zero length
+String=''   # Zero-length ("null") string variable.
+if [ -z "$String" ]
+then
+  echo "\$String is null."
+else
+  echo "\$String is NOT null."
+fi     # $String is null.
+
+-- string is not null.
+-n
+
+
+
+
+
+  -- CONCAT
+
+a='hello'
+b='world'
+c=$a$b
+echo $c
+  helloworld
+
+foo="Hello"
+foo="$foo World"
+echo $foo
+  Hello World
+
+
+  -- FILE TEST OPERATORS
+
+-e
+file exists
+
+-a
+file exists
+   This is identical in effect to -e. It has been "deprecated," [1] and its use is discouraged.
+
+-f
+file is a regular file (not a directory or device file)
+
+-s
+file is not zero size
+
+-d
+file is a directory
+
+-b
+file is a block device
+
+
+-c
+file is a character device
+ device0="/dev/sda2"    # /   (root directory)
+ if [ -b "$device0" ]
+ then
+   echo "$device0 is a block device."
+ fi
+ # /dev/sda2 is a block device.
+ device1="/dev/ttyS1"   # PCMCIA modem card.
+ if [ -c "$device1" ]
+ then
+   echo "$device1 is a character device."
+ fi
+ # /dev/ttyS1 is a character device.
+
+-p
+file is a pipe
+ function show_input_type()
+ {
+    [ -p /dev/fd/0 ] && echo PIPE || echo STDIN
+ }
+ show_input_type "Input"                           # STDIN
+ echo "Input" | show_input_type                    # PIPE
+
+-h
+file is a symbolic link
+
+-L
+file is a symbolic link
+
+-S
+file is a socket
+
+-t
+file (descriptor) is associated with a terminal device
+   This test option may be used to check whether the stdin [ -t 0 ] or stdout [ -t 1 ] in a given    script is a terminal.
+
+-r
+file has read permission (for the user running the test)
+
+-w
+file has write permission (for the user running the test)
+
+-x
+file has execute permission (for the user running the test)
+
+-g
+set-group-id (sgid) flag set on file or directory
+   If a directory has the sgid flag set, then a file created within that directory belongs to the group    that owns the directory, not necessarily to the group of the user who created the file. This may be    useful for a directory shared by a workgroup.
+
+-u
+set-user-id (suid) flag set on file
+   A binary owned by root with set-user-id flag set runs with root privileges, even when an ordinary    user invokes it. [2] This is useful for executables (such as pppd and cdrecord) that need to access    system hardware. Lacking the suid flag, these binaries could not be invoked by a non-root user.
+	      -rwsr-xr-t    1 root       178236 Oct  2  2000 /usr/sbin/pppd     
+   A file with the suid flag set shows an s in its permissions.
+
+-k
+sticky bit set
+   Commonly known as the sticky bit, the save-text-mode flag is a special type of file permission. If a    file has this flag set, that file will be kept in cache memory, for quicker access. [3] If set on a    directory, it restricts write permission. Setting the sticky bit adds a t to the permissions on the    file or directory listing. This restricts altering or deleting specific files in that directory to      the owner of those files.
+	      drwxrwxrwt    7 root         1024 May 19 21:26 tmp/     
+   If a user does not own a directory that has the sticky bit set, but has write permission in that    directory, she can only delete those files that she owns in it. This keeps users from inadvertently    overwriting or deleting each other's files in a publicly accessible directory, such as /tmp. (The       owner of the directory or root can, of course, delete or rename files there.)
+
+-O
+you are owner of file
+
+-G
+group-id of file same as yours
+
+-N
+file modified since it was last read
+
+f1 -nt f2
+file f1 is newer than f2
+
+f1 -ot f2
+file f1 is older than f2
+
+f1 -ef f2
+files f1 and f2 are hard links to the same file
+
+!
+"not" -- reverses the sense of the tests above (returns true if condition absent).
+
+
+
+
+  -- EXIT STATUS
+  
+echo $?
+
+    $ echo hello
+    hello
+    
+    sergii.burtovyi@KBP1-LHP-F49312 ~
+    $ echo $?
+    0
+    
+    sergii.burtovyi@KBP1-LHP-F49312 ~
+    $ ncsldiff -V
+    
+    sergii.burtovyi@KBP1-LHP-F49312 ~
+    $ echo $?
+    127
+
+Exit Code Number	Meaning	Example	Comments
+1	Catchall for general errors	let "var1 = 1/0"	Miscellaneous errors, such as "divide by zero" and other impermissible operations
+2	Misuse of shell builtins (according to Bash documentation)	empty_function() {}	Missing keyword or command, or permission problem (and diff return code on a failed binary file comparison).
+126	Command invoked cannot execute	/dev/null	Permission problem or command is not an executable
+127	"command not found"	illegal_command	Possible problem with $PATH or a typo
+128	Invalid argument to exit	exit 3.14159	exit takes only integer args in the range 0 - 255 (see first footnote)
+128+n	Fatal error signal "n"	kill -9 $PPID of script	$? returns 137 (128 + 9)
+130	Script terminated by Control-C	Ctl-C	Control-C is fatal error signal 2, (130 = 128 + 2, see above)
+255*	Exit status out of range	exit -1	exit takes only integer args in the range 0 - 255
+
+
+
+  -- HOME
+
+-- define home of user which fires bash
+USER_HOME=$(eval echo ~${SUDO_USER})
+
+
+
+
+  -- INTERACTIVE INPUT
+
+-- ��������� � ����� ����� ��������� ���������� USER
+read -p "������� ��� ������������ : " USER
+
+
+
+
+  -- IF/THEN/ELSE/FI
+
+if [ $x -eq $y ]
+then 
+   echo $x taki equal to $y
+else 
+   echo $x taki NOT equal to $y
+fi
+
+
+
+
+  -- CASE
+
+case $x in
+2)
+  echo '$x taki 2'
+  ;;
+[5-7])
+  echo '$x taki 5-7'
+  ;;
+*)
+  echo '$x hren znaet gde (ne 2 i ne 5-7)'
+  ;;
+esac
+
+
+
+
+  -- LOOP
+
+-- for - a list of commands is executed for each value in the list.
+for NAME [in LIST ]; do COMMANDS; done
+
+-- while - ��������� ����������� ��� ������ �� ����������� �������
+while [ $x -lt $y ]; do echo 'test'; done
+
+-- until - ��������� ����������� ��� ������ ����������� �������
+until [ $x -eq $y ]; do echo 'test'; done
+
+
+
+  -- MEMORY
+
+-- %cpu,%memory utilization of the processes in order of memory usage from highest to lowest
+ps -eo pcpu,%mem,cmd|sort -k2 -r
+ 1.4  5.0 /u01/ingres/bin/iidbms dbms (default) II
+ 0.0  4.5 /u01/ingres/bin/iidbms recovery (dmfrcp) II
+ 0.0  1.9 /usr/bin/python -tt /usr/bin/puplet
+
+
+
+
+
+
+
+procs -----------memory---------- ---swap-- -----io---- --system-- -----cpu------
+ r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
+ 0  0      0 360088  83364 403388    0    0   165    23 1571  239  4 11 84  1  0
+
+
+vmstat | awk 'FNR == 3 {print $4}'
+359972
+vmstat | awk 'FNR == 3 {print $15}'
+85
+
+mem=$(vmstat | awk 'FNR == 3 {print $4}')
+cpu=$((100 - $(vmstat | awk 'FNR == 3 {print $15}')))
+
+vmstat | awk 'FNR == 3 {print "CPU usage is: " $13 + $14 + $16 + $17 }'
+
+--Main command
+vmstat | awk 'FNR == 3 {print "Free Memory is: " $4/1024 "Mb   CPU usage (us+sy+wa+st) is: " $13 + $14 + $16 + $17 "%" }'
+
+
+
+
+-- cron#1 
+vmstat | awk 'FNR == 3 {print "Free Memory is: " $4/1024 "Mb   CPU usage (us+sy+wa+st) is: " $13 + $14 + $16 + $17 "%" }' >> "sysstat.log"
+
+
+
+
+
+-- first check
+awk 'END {print NR}' text.txt
+
+
+
+
+
+
+
+
+
+
+-- proverks existing file
+FILENAME="text.txt"
+
+if [ -e $FILENAME ] 
+then 
+   echo taki exist
+else 
+   echo taki net takogo
+fi
+
+
+
+
+
+
+
+-- sam
+
+if [ $(awk 'END {print NR}' t.f) -gt 2 ]
+then 
+   echo tam bolwe 2 strok
+fi
+
+
+FILENAME="t.f"
+if [ $(awk 'END {print NR}' $FILENAME) -gt 2 ]
+then
+   echo tam bolwe 2 strok
+   if [ -e $FILENAME-1 ] 
+   then 
+      echo a $FILENAME-1 exists
+   else 
+      echo a $FILENAME-1 NOT exists
+   fi     
+fi
+
+-- ROTATOR FOR 2 FILES!!!
+FILENAME="t.f"
+
+if [ -e $FILENAME ] 
+then
+   if [ $(awk 'END {print NR}' $FILENAME) -gt 2 ]
+   then
+      echo tam bolwe 2 strok
+      if [ -e $FILENAME-1 ]
+      then
+         echo a $FILENAME-1 exists and will be renamed to $FILENAME-2
+         if [ -e $FILENAME-2 ] 
+         then 
+            echo a $FILENAME-2 exists and will be deleted
+            rm $FILENAME-2
+            mv $FILENAME-1 $FILENAME-2
+            mv $FILENAME $FILENAME-1
+         else 
+            echo a $FILENAME-2 NOT exists
+            mv $FILENAME-1 $FILENAME-2
+            mv $FILENAME $FILENAME-1
+         fi
+      else
+         echo a $FILENAME-1 NOT exists and will be created
+         mv $FILENAME $FILENAME-1
+      fi
+   fi
+else 
+   echo $FILENAME does not exist
+fi
+
+ 
+
+
+
+-- ROTATOR FOR 2 LOGS (SECOND APPROACH)
+FILENAME=t.f
+
+if [ -e $FILENAME-1 ]; then bak1=1; else bak1=0; fi
+if [ -e $FILENAME-2 ]; then bak2=2; else bak2=0; fi
+total_bak=$(( $bak1 + $bak2 ))
+
+if [ -e $FILENAME ] 
+then
+   if [ $(awk 'END {print NR}' $FILENAME) -gt 2 ]
+   then 
+      echo tam bolwe 2 strok
+      case $total_bak in
+      0)
+        echo $FILENAME will be backuped to $FILENAME-1
+        mv $FILENAME $FILENAME-1
+        ;;
+      1)
+        echo $FILENAME-1 will be moved to $FILENAME-2
+        echo $FILENAME will be backuped to $FILENAME-1
+        mv $FILENAME-1 $FILENAME-2
+        mv $FILENAME $FILENAME-1
+        ;;
+      3)
+        echo $FILENAME-2 will be removed
+        echo $FILENAME-1 will be moved to $FILENAME-2
+        echo $FILENAME will be backuped to $FILENAME-1
+        rm $FILENAME-2
+        mv $FILENAME-1 $FILENAME-2
+        mv $FILENAME $FILENAME-1
+        ;;
+      *)
+        echo 'some backups are missing - errors are possible'
+        rm $FILENAME-2
+        mv $FILENAME-1 $FILENAME-2
+        mv $FILENAME $FILENAME-1
+        ;;
+      esac
+   else 
+      echo tam menwe 2 strok
+   fi
+else
+   echo $FILENAME does not exists
+fi
+
+
+
+
+
+
+
+
+
+-- FILE CREATOR
+vmstat | awk 'FNR == 3 {print "Free Memory is: " $4/1024 "Mb   CPU usage (us+sy+wa+st) is: " $13 + $14 + $16 + $17 "%" }' >> "sysstat.log"
+
+
+
+
+
+-- ROTATOR FOR 5 LOGS
+#!/bin/bash
+
+#maintenance of 5 FILENAME's backups
+
+FILENAME="sysstat.log"
+ROTATORLOG="rotator.log"
+num_of_rows=40
+
+if [ -e $FILENAME-1 ]; then log1=1; else log1=0; fi
+if [ -e $FILENAME-2 ]; then log2=2; else log2=0; fi
+if [ -e $FILENAME-3 ]; then log3=4; else log3=0; fi
+if [ -e $FILENAME-4 ]; then log4=8; else log4=0; fi
+if [ -e $FILENAME-5 ]; then log5=16; else log5=0; fi
+total_logs=$(( $log1 + $log2 + $log3 +$log4 + $log5 ))
+
+echo "#This is the log of last rotator work" > $ROTATORLOG 
+date >> $ROTATORLOG
+echo " " >> $ROTATORLOG 
+
+if [ -e $FILENAME ] 
+then
+   if [ $(awk 'END {print NR}' $FILENAME) -gt $num_of_rows ]
+   then 	
+      echo There are more then $num_of_rows strings at the $FILENAME, so ... >> $ROTATORLOG
+      case $total_logs in
+      0)
+        echo ... $FILENAME will be backuped to $FILENAME-1 >> $ROTATORLOG
+        mv $FILENAME $FILENAME-1
+        ;;
+      1)
+        echo ... $FILENAME-1 will be moved to $FILENAME-2 >> $ROTATORLOG
+        echo ... $FILENAME will be backuped to $FILENAME-1 >> $ROTATORLOG
+        mv $FILENAME-1 $FILENAME-2
+        mv $FILENAME $FILENAME-1
+        ;;
+      3)
+        echo ... $FILENAME-2 will be moved to $FILENAME-3 >> $ROTATORLOG
+        echo ... $FILENAME-1 will be moved to $FILENAME-2 >> $ROTATORLOG
+        echo ... $FILENAME will be backuped to $FILENAME-1 >> $ROTATORLOG
+        mv $FILENAME-2 $FILENAME-3
+        mv $FILENAME-1 $FILENAME-2
+        mv $FILENAME $FILENAME-1
+        ;;
+      7)
+        echo ... $FILENAME-3 will be moved to $FILENAME-4 >> $ROTATORLOG
+        echo ... $FILENAME-2 will be moved to $FILENAME-3 >> $ROTATORLOG
+        echo ... $FILENAME-1 will be moved to $FILENAME-2 >> $ROTATORLOG
+        echo ... $FILENAME will be backuped to $FILENAME-1 >> $ROTATORLOG
+        mv $FILENAME-3 $FILENAME-4
+        mv $FILENAME-2 $FILENAME-3
+        mv $FILENAME-1 $FILENAME-2
+        mv $FILENAME $FILENAME-1
+        ;;
+      15)
+        echo ... $FILENAME-4 will be moved to $FILENAME-5 >> $ROTATORLOG
+        echo ... $FILENAME-3 will be moved to $FILENAME-4 >> $ROTATORLOG
+        echo ... $FILENAME-2 will be moved to $FILENAME-3 >> $ROTATORLOG
+        echo ... $FILENAME-1 will be moved to $FILENAME-2 >> $ROTATORLOG
+        echo ... $FILENAME will be backuped to $FILENAME-1 >> $ROTATORLOG
+        mv $FILENAME-4 $FILENAME-5
+        mv $FILENAME-3 $FILENAME-4
+        mv $FILENAME-2 $FILENAME-3
+        mv $FILENAME-1 $FILENAME-2
+        mv $FILENAME $FILENAME-1
+        ;;
+      31)
+        echo ... $FILENAME-5 will be removed >> $ROTATORLOG
+        echo ... $FILENAME-4 will be moved to $FILENAME-5 >> $ROTATORLOG
+        echo ... $FILENAME-3 will be moved to $FILENAME-4 >> $ROTATORLOG
+        echo ... $FILENAME-2 will be moved to $FILENAME-3 >> $ROTATORLOG
+        echo ... $FILENAME-1 will be moved to $FILENAME-2 >> $ROTATORLOG
+        echo ... $FILENAME will be backuped to $FILENAME-1 >> $ROTATORLOG
+	rm $FILENAME-5
+        mv $FILENAME-4 $FILENAME-5
+        mv $FILENAME-3 $FILENAME-4
+        mv $FILENAME-2 $FILENAME-3
+        mv $FILENAME-1 $FILENAME-2
+        mv $FILENAME $FILENAME-1
+        ;;
+      *)
+        echo 'Some backups are missing - errors are possible' >> $ROTATORLOG
+	rm $FILENAME-5
+        mv $FILENAME-4 $FILENAME-5
+        mv $FILENAME-3 $FILENAME-4
+        mv $FILENAME-2 $FILENAME-3
+        mv $FILENAME-1 $FILENAME-2
+        mv $FILENAME $FILENAME-1
+        ;;
+      esac
+   else 
+      echo There are no more then $num_of_rows strings at the $FILENAME >> $ROTATORLOG
+   fi
+else
+   echo $FILENAME does not exists >> $ROTATORLOG
+fi
+
+ 
+
+
