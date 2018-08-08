@@ -1,0 +1,34 @@
+# SHELL-SCRIPTING OVERALL
+
+[Docs #1](https://devhints.io/bash)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
