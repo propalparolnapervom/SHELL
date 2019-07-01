@@ -82,6 +82,13 @@ sed -e "s/:.*//"
     #Remove all in the string BEFORE some symbol (":" in the example)
 
 sed -e "s/.*://"
+
+    #Remove all in the string BEFORE some LAST symbol ("/" in the example) 
+    # so:   /xxx/yy/zzz -> /xxx/yy
+     
+sed 's|\(.*\)/.*|\1|'
+     
+     
     
     #Remove all leading spaces/tabs/etc at the string
         
