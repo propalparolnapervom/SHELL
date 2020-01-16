@@ -72,6 +72,13 @@ echo "Script's arguments separated into different variables: $1 $2..."
 
 
 
+# CUT
+
+    # Remove all string AFTER some symbol ("/" in the example) 
+    
+cut -f1,2 -d'/'
+
+
 
 # SED: all
 
